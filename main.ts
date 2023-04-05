@@ -73,6 +73,25 @@ function doDrop () {
         showError()
     }
 }
+control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_A, EventBusValue.MICROBIT_BUTTON_EVT_UP, function () {
+    if (idle_counter <= max_idle) {
+        if (button_a) {
+            if (button_b) {
+                button_b = 0
+                showStack()
+            } else {
+                button_a = control.eventTimestamp() - button_a
+                if (button_a < 400000) {
+                    clickA()
+                } else {
+                    pushA()
+                }
+            }
+        }
+    }
+    idle_counter = 0
+    button_a = 0
+})
 function showOp () {
     ops[op_index].showImage(0)
 }
@@ -180,25 +199,6 @@ function nextInc () {
 function tiltLeft () {
     num = num * 10
 }
-control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_A, EventBusValue.MICROBIT_BUTTON_EVT_UP, function () {
-    if (idle_counter <= max_idle) {
-        if (button_a) {
-            if (button_b) {
-                button_b = 0
-                showStack()
-            } else {
-                button_a = control.eventTimestamp() - button_a
-                if (button_a < 400000) {
-                    clickA()
-                } else {
-                    pushA()
-                }
-            }
-        }
-    }
-    idle_counter = 0
-    button_a = 0
-})
 function pushA () {
     if (state) {
         state = 0
@@ -441,6 +441,9 @@ function pushNum () {
         num_init = false
     }
 }
+/**
+ * Currently unused increment modifier
+ */
 function prevInc () {
     inc = Math.constrain(inc - 1, -1, 1)
 }
@@ -471,22 +474,34 @@ control.onEvent(EventBusSource.MICROBIT_ID_ACCELEROMETER, EventBusValue.MICROBIT
     ay = input.acceleration(Dimension.Y)
     az = input.acceleration(Dimension.Z)
     if (tilted) {
-        if (az < -950) {
+        if (az < -800) {
             tilted = false
         }
     } else {
         if (ax < -950) {
-            tiltLeft()
+            if (idle_counter <= max_idle) {
+                tiltLeft()
+            }
             tilted = true
+            idle_counter = 0
         } else if (ax > 950) {
-            tiltRight()
+            if (idle_counter <= max_idle) {
+                tiltRight()
+            }
             tilted = true
+            idle_counter = 0
         } else if (ay > 950) {
-            tiltUp()
+            if (idle_counter <= max_idle) {
+                tiltUp()
+            }
             tilted = true
+            idle_counter = 0
         } else if (ay < -950) {
-            tiltDown()
+            if (idle_counter <= max_idle) {
+                tiltDown()
+            }
             tilted = true
+            idle_counter = 0
         }
     }
 })
@@ -521,10 +536,6 @@ let dot: Image = null
 let tilted = false
 let led_state = 0
 let states = 0
-let button_b = 0
-let button_a = 0
-let max_idle = 0
-let idle_counter = 0
 let inc = 0
 let num = 0
 let num_init = false
@@ -533,6 +544,10 @@ let value2 = 0
 let value1 = 0
 let op_index = 0
 let ops: Image[] = []
+let button_b = 0
+let button_a = 0
+let max_idle = 0
+let idle_counter = 0
 let stack: number[] = []
 init()
 showInit()
