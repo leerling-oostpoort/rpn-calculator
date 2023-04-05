@@ -361,20 +361,20 @@ function doClear () {
 }
 function animateHeart () {
     if (led_state == 0) {
-        basic.clearScreen()
+        dot.showImage(0)
+    } else if (led_state == 1) {
+        images.iconImage(IconNames.SmallHeart).showImage(0)
+    } else if (led_state == 2) {
+        images.iconImage(IconNames.Heart).showImage(0)
+    } else if (led_state == 3) {
+        images.iconImage(IconNames.SmallHeart).showImage(0)
     } else if (led_state == 6) {
         dot.showImage(0)
     } else if (led_state == 7) {
-        images.iconImage(IconNames.SmallHeart).showImage(0)
-    } else if (led_state == 8) {
-        images.iconImage(IconNames.Heart).showImage(0)
-    } else if (led_state == 11) {
-        images.iconImage(IconNames.SmallHeart).showImage(0)
-    } else if (led_state == 12) {
-        dot.showImage(0)
+        basic.clearScreen()
     }
     led_state += 1
-    if (led_state > 12) {
+    if (led_state > 20) {
         led_state = 0
     }
 }
