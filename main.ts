@@ -147,19 +147,22 @@ function doSquare () {
     }
 }
 control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_A, EventBusValue.MICROBIT_BUTTON_EVT_UP, function () {
-    if (button_a) {
-        if (button_b) {
-            button_b = 0
-            showStack()
-        } else {
-            button_a = control.eventTimestamp() - button_a
-            if (button_a < 400000) {
-                clickA()
+    if (idle_counter <= max_idle) {
+        if (button_a) {
+            if (button_b) {
+                button_b = 0
+                showStack()
             } else {
-                pushA()
+                button_a = control.eventTimestamp() - button_a
+                if (button_a < 400000) {
+                    clickA()
+                } else {
+                    pushA()
+                }
             }
         }
     }
+    idle_counter = 0
     button_a = 0
 })
 function pushA () {
@@ -208,6 +211,8 @@ function init () {
     states = 2
     state = 0
     led_state = 0
+    idle_counter = 0
+    max_idle = 100
     ops = [
     images.createImage(`
         . . # . .
@@ -319,7 +324,23 @@ function doClear () {
     stack = []
 }
 function animateHeart () {
-	
+    if (led_state == 0) {
+        basic.clearScreen()
+    } else if (led_state == 6) {
+        dot.showImage(0)
+    } else if (led_state == 7) {
+        images.iconImage(IconNames.SmallHeart).showImage(0)
+    } else if (led_state == 8) {
+        images.iconImage(IconNames.Heart).showImage(0)
+    } else if (led_state == 11) {
+        images.iconImage(IconNames.SmallHeart).showImage(0)
+    } else if (led_state == 12) {
+        dot.showImage(0)
+    }
+    led_state += 1
+    if (led_state > 12) {
+        led_state = 0
+    }
 }
 control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_B, EventBusValue.MICROBIT_BUTTON_EVT_DOWN, function () {
     button_b = control.eventTimestamp()
@@ -336,19 +357,22 @@ control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_A, EventBusValue.MICROBIT_BUTT
     button_a = control.eventTimestamp()
 })
 control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_B, EventBusValue.MICROBIT_BUTTON_EVT_UP, function () {
-    if (button_b) {
-        if (button_a) {
-            button_a = 0
-            showStack()
-        } else {
-            button_b = control.eventTimestamp() - button_b
-            if (button_b < 400000) {
-                clickB()
+    if (idle_counter <= max_idle) {
+        if (button_b) {
+            if (button_a) {
+                button_a = 0
+                showStack()
             } else {
-                pushB()
+                button_b = control.eventTimestamp() - button_b
+                if (button_b < 400000) {
+                    clickB()
+                } else {
+                    pushB()
+                }
             }
         }
     }
+    idle_counter = 0
     button_b = 0
 })
 function doSum () {
@@ -434,6 +458,8 @@ let num = 0
 let num_init = false
 let button_b = 0
 let button_a = 0
+let max_idle = 0
+let idle_counter = 0
 let state = 0
 let value2 = 0
 let value1 = 0
@@ -443,11 +469,16 @@ let stack: number[] = []
 init()
 showInit()
 loops.everyInterval(100, function () {
+    idle_counter += 1
     if (!(busy)) {
-        if (state == 0) {
-            showNum()
-        } else if (state == 1) {
-            showOp()
+        if (idle_counter > max_idle) {
+            animateHeart()
+        } else {
+            if (state == 0) {
+                showNum()
+            } else if (state == 1) {
+                showOp()
+            }
         }
     }
 })
