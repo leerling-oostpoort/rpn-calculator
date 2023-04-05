@@ -1,5 +1,5 @@
 
-> Open this page at [https://leerling-oostpoort.github.io/jaarpn-calculatorp/](https://leerling-oostpoort.github.io/rpn-calculator/)
+> Open this page at [https://leerling-oostpoort.github.io/rpn-calculator/](https://leerling-oostpoort.github.io/rpn-calculator/)
 
 ## Use as Extension
 
