@@ -15,6 +15,14 @@
  * 
  * - Press A and B simultaneously to show stack
  * 
+ * - Tilt left to multiply entry by 10
+ * 
+ * - Tilt right to divide entry by 10
+ * 
+ * - Tilt up/backward to edit the last stack entry
+ * 
+ * - Tilt down/forward to clear the entry
+ * 
  * Operations:
  * 
  * - Add: add two last number on stack
@@ -45,6 +53,9 @@
  * Button event handling:
  * 
  * Deal with press, long press and two button press
+ */
+/**
+ * Tilt handling
  */
 /**
  * Number and operator entry
@@ -123,6 +134,17 @@ function prevOp () {
         op_index = ops.length - 1
     }
 }
+function tiltUp () {
+    if (stack.length >= 1) {
+        if (!(num_init)) {
+            num_init = true
+            num = stack.pop()
+        }
+    }
+}
+function tiltRight () {
+    num = num / 10
+}
 function nextOp () {
     op_index += 1
     if (op_index >= ops.length) {
@@ -138,6 +160,12 @@ function doDiv () {
         showError()
     }
 }
+function tiltDown () {
+    if (num_init) {
+        num_init = false
+        num = 0
+    }
+}
 function doSquare () {
     if (stack.length >= 1) {
         value2 = stack.pop()
@@ -145,6 +173,12 @@ function doSquare () {
     } else {
         showError()
     }
+}
+function nextInc () {
+    inc = Math.constrain(inc + 1, -1, 1)
+}
+function tiltLeft () {
+    num = num * 10
 }
 control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_A, EventBusValue.MICROBIT_BUTTON_EVT_UP, function () {
     if (idle_counter <= max_idle) {
@@ -213,6 +247,8 @@ function init () {
     led_state = 0
     idle_counter = 0
     max_idle = 100
+    inc = 0
+    tilted = false
     ops = [
     images.createImage(`
         . . # . .
@@ -317,7 +353,7 @@ function clickA () {
     }
 }
 function nextNum () {
-    num += 1
+    num += 1 * 10 ** inc
     num_init = true
 }
 function doClear () {
@@ -350,8 +386,8 @@ function pushB () {
     if (state == 1) {
         doOp()
         state = 0
+        showStack()
     }
-    showStack()
 }
 control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_A, EventBusValue.MICROBIT_BUTTON_EVT_DOWN, function () {
     button_a = control.eventTimestamp()
@@ -405,6 +441,9 @@ function pushNum () {
         num_init = false
     }
 }
+function prevInc () {
+    inc = Math.constrain(inc - 1, -1, 1)
+}
 function doSub () {
     if (stack.length >= 2) {
         value1 = stack.pop()
@@ -424,9 +463,33 @@ function doMul () {
     }
 }
 function prevNum () {
-    num += -1
+    num += -1 * 10 ** inc
     num_init = true
 }
+control.onEvent(EventBusSource.MICROBIT_ID_ACCELEROMETER, EventBusValue.MICROBIT_ACCELEROMETER_EVT_DATA_UPDATE, function () {
+    ax = input.acceleration(Dimension.X)
+    ay = input.acceleration(Dimension.Y)
+    az = input.acceleration(Dimension.Z)
+    if (tilted) {
+        if (az < -950) {
+            tilted = false
+        }
+    } else {
+        if (ax < -950) {
+            tiltLeft()
+            tilted = true
+        } else if (ax > 950) {
+            tiltRight()
+            tilted = true
+        } else if (ay > 950) {
+            tiltUp()
+            tilted = true
+        } else if (ay < -950) {
+            tiltDown()
+            tilted = true
+        }
+    }
+})
 function showError () {
     busy = true
     basic.showIcon(IconNames.Sad)
@@ -450,16 +513,21 @@ function showStack () {
     }
     busy = false
 }
+let az = 0
+let ay = 0
+let ax = 0
 let busy = false
 let dot: Image = null
+let tilted = false
 let led_state = 0
 let states = 0
-let num = 0
-let num_init = false
 let button_b = 0
 let button_a = 0
 let max_idle = 0
 let idle_counter = 0
+let inc = 0
+let num = 0
+let num_init = false
 let state = 0
 let value2 = 0
 let value1 = 0
