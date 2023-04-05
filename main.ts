@@ -42,6 +42,11 @@
  * - Clear: clear the stack
  */
 /**
+ * Button event handling:
+ * 
+ * Deal with press, long press and two button press
+ */
+/**
  * Number and operator entry
  */
 /**
@@ -63,9 +68,9 @@ function showOp () {
 function doSwap () {
     if (stack.length >= 2) {
         value1 = stack.pop()
-        value22 = stack.pop()
+        value2 = stack.pop()
         stack.push(value1)
-        stack.push(value22)
+        stack.push(value2)
     } else {
         showError()
     }
@@ -127,8 +132,8 @@ function nextOp () {
 function doDiv () {
     if (stack.length >= 2) {
         value1 = stack.pop()
-        value22 = stack.pop()
-        stack.push(value22 / value1)
+        value2 = stack.pop()
+        stack.push(value2 / value1)
     } else {
         showError()
     }
@@ -202,6 +207,7 @@ function showInit () {
 function init () {
     states = 2
     state = 0
+    led_state = 0
     ops = [
     images.createImage(`
         . . # . .
@@ -312,6 +318,9 @@ function nextNum () {
 function doClear () {
     stack = []
 }
+function animateHeart () {
+	
+}
 control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_B, EventBusValue.MICROBIT_BUTTON_EVT_DOWN, function () {
     button_b = control.eventTimestamp()
 })
@@ -323,11 +332,6 @@ function pushB () {
     }
     showStack()
 }
-/**
- * Button event handling:
- * 
- * Deal with press, long press and double press
- */
 control.onEvent(EventBusSource.MICROBIT_ID_BUTTON_A, EventBusValue.MICROBIT_BUTTON_EVT_DOWN, function () {
     button_a = control.eventTimestamp()
 })
@@ -364,8 +368,8 @@ function doDup () {
 function doAdd () {
     if (stack.length >= 2) {
         value1 = stack.pop()
-        value22 = stack.pop()
-        stack.push(value22 + value1)
+        value2 = stack.pop()
+        stack.push(value2 + value1)
     } else {
         showError()
     }
@@ -380,8 +384,8 @@ function pushNum () {
 function doSub () {
     if (stack.length >= 2) {
         value1 = stack.pop()
-        value22 = stack.pop()
-        stack.push(value22 - value1)
+        value2 = stack.pop()
+        stack.push(value2 - value1)
     } else {
         showError()
     }
@@ -389,8 +393,8 @@ function doSub () {
 function doMul () {
     if (stack.length >= 2) {
         value1 = stack.pop()
-        value22 = stack.pop()
-        stack.push(value22 * value1)
+        value2 = stack.pop()
+        stack.push(value2 * value1)
     } else {
         showError()
     }
@@ -407,8 +411,8 @@ function showError () {
 function doPower () {
     if (stack.length >= 2) {
         value1 = stack.pop()
-        value22 = stack.pop()
-        stack.push(value22 ** value1)
+        value2 = stack.pop()
+        stack.push(value2 ** value1)
     } else {
         showError()
     }
@@ -424,14 +428,14 @@ function showStack () {
 }
 let busy = false
 let dot: Image = null
+let led_state = 0
 let states = 0
 let num = 0
 let num_init = false
 let button_b = 0
 let button_a = 0
-let value2 = 0
 let state = 0
-let value22 = 0
+let value2 = 0
 let value1 = 0
 let op_index = 0
 let ops: Image[] = []
