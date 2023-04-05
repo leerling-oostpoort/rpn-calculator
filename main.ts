@@ -35,7 +35,7 @@
  * 
  * - Dup: duplicate last entry on stack
  * 
- * - Swap: swap last to number on stack
+ * - Swap: swap last two numbers on stack
  * 
  * - Drop: drop the last number on the stack
  * 
